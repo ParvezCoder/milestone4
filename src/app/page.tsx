@@ -18,6 +18,8 @@ const CreateAndEditData = () => {
   const [createdExperience, setCreatedExperience] = useState<string | null>(null);
   const [uniqueURL, setUniqueURL] = useState<string | null>(null);
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -30,7 +32,26 @@ const CreateAndEditData = () => {
     }
   };
 
+  const validate = () => {
+    const validationErrors: { [key: string]: string } = {};
+    if (!name) validationErrors.name = "Name is required.";
+    if (!email) validationErrors.email = "Email is required.";
+    else if (!/\S+@\S+\.\S+/.test(email)) validationErrors.email = "Email is invalid.";
+    if (!education) validationErrors.education = "Education is required.";
+    if (!work) validationErrors.work = "Work is required.";
+    if (!experience) validationErrors.experience = "Experience is required.";
+    if (!image) validationErrors.image = "Image is required.";
+
+    return validationErrors;
+  };
+
   const handleCreate = () => {
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     setCreatedName(name);
     setCreatedEmail(email);
     setCreatedEducation(education);
@@ -46,6 +67,9 @@ const CreateAndEditData = () => {
     setEducation("");
     setWork("");
     setExperience("");
+    setImage(null);
+    setImageBase64(null);
+    setErrors({});
   };
 
   const handleDownloadPDF = () => {
@@ -86,6 +110,7 @@ const CreateAndEditData = () => {
               onChange={(e) => setName(e.target.value)}
               className="border rounded px-3 py-2 w-full"
             />
+            {errors.name && <p className="text-red-500">{errors.name}</p>}
           </div>
           <div className="mb-4">
             <label className="block mb-2 text-white">Email:</label>
@@ -95,6 +120,7 @@ const CreateAndEditData = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="border rounded px-3 py-2 w-full"
             />
+            {errors.email && <p className="text-red-500">{errors.email}</p>}
           </div>
           <div className="mb-4">
             <label className="block mb-2 text-white">Education:</label>
@@ -104,6 +130,7 @@ const CreateAndEditData = () => {
               onChange={(e) => setEducation(e.target.value)}
               className="border rounded px-3 py-2 w-full"
             />
+            {errors.education && <p className="text-red-500">{errors.education}</p>}
           </div>
           <div className="mb-4">
             <label className="block mb-2 text-white">Work:</label>
@@ -113,6 +140,7 @@ const CreateAndEditData = () => {
               onChange={(e) => setWork(e.target.value)}
               className="border rounded px-3 py-2 w-full"
             />
+            {errors.work && <p className="text-red-500">{errors.work}</p>}
           </div>
           <div className="mb-4">
             <label className="block mb-2 text-white">Experience:</label>
@@ -122,12 +150,14 @@ const CreateAndEditData = () => {
               onChange={(e) => setExperience(e.target.value)}
               className="border rounded px-3 py-2 w-full"
             />
+            {errors.experience && <p className="text-red-500">{errors.experience}</p>}
           </div>
 
           {/* Image Upload */}
           <div className="mb-4">
             <label className="block mb-2 text-white">Upload Image:</label>
             <input type="file" accept="image/*" onChange={handleImageUpload} />
+            {errors.image && <p className="text-red-500">{errors.image}</p>}
           </div>
 
           {/* Create Resume Button */}
